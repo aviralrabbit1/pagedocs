@@ -1,0 +1,42 @@
+# Local development infrastructure for PageDocs.
+# Start with: docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pagedocs
+      POSTGRES_PASSWORD: pagedocs
+      POSTGRES_DB: pagedocs
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pagedocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  # Gotenberg wraps LibreOffice + Chromium behind a clean HTTP API.
+  # Used by the ConversionModule for docx <-> pdf and html -> pdf.
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    command:
+      - "gotenberg"
+      - "--api-timeout=60s"
+
+volumes:
+  pgdata:
+  redisdata:

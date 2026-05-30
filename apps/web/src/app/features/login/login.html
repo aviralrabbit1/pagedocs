@@ -1,0 +1,27 @@
+<div class="auth-card">
+  <h1>Sign in to PageDocs</h1>
+
+  <form (ngSubmit)="submit()">
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required autocomplete="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+    </label>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="loading()">
+      {{ loading() ? 'Signing in…' : 'Sign in' }}
+    </button>
+  </form>
+
+  <button type="button" class="google" (click)="google()">Continue with Google</button>
+
+  <p>No account? <a routerLink="/register">Create one</a></p>
+</div>

@@ -1,0 +1,7 @@
+{
+  "name": "@pagedocs/shared-types",
+  "version": "0.0.1",
+  "private": true,
+  "types": "src/index.ts",
+  "main": "src/index.ts"
+}

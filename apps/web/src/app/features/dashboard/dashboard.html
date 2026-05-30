@@ -1,0 +1,31 @@
+<header class="topbar">
+  <h1>PageDocs</h1>
+  <div class="spacer"></div>
+  @if (user(); as u) {
+    <span>{{ u.displayName || u.email }}</span>
+  }
+  <button (click)="logout()">Log out</button>
+</header>
+
+<main>
+  <div class="actions">
+    <button (click)="create()">New document</button>
+    <button (click)="refresh()">Refresh</button>
+  </div>
+
+  @if (loading()) {
+    <p>Loading…</p>
+  } @else if (docs().length === 0) {
+    <p>No documents yet. Create your first one.</p>
+  } @else {
+    <ul class="doc-list">
+      @for (doc of docs(); track doc.id) {
+        <li>
+          <span class="title">{{ doc.title }}</span>
+          <span class="meta">{{ doc.updatedAt | date: 'short' }}</span>
+          <button (click)="remove(doc.id)">Delete</button>
+        </li>
+      }
+    </ul>
+  }
+</main>
