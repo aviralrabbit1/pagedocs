@@ -1,0 +1,30 @@
+<div class="auth-card">
+  <h1>Create your PageDocs account</h1>
+
+  <form (ngSubmit)="submit()">
+    <label>
+      Name
+      <input type="text" name="displayName" [(ngModel)]="displayName" autocomplete="name" />
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required autocomplete="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required minlength="8" autocomplete="new-password" />
+    </label>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="loading()">
+      {{ loading() ? 'Creating…' : 'Create account' }}
+    </button>
+  </form>
+
+  <p>Already have an account? <a routerLink="/login">Sign in</a></p>
+</div>

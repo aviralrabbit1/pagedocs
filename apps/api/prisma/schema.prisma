@@ -1,0 +1,220 @@
+// PageDocs database schema.
+// Postgres + Prisma. See architecture plan §5 for rationale.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  local
+  google
+}
+
+enum OAuthProvider {
+  google
+  github
+  google_drive
+}
+
+enum StorageProvider {
+  db
+  github
+  google_drive
+}
+
+enum PermissionRole {
+  owner
+  editor
+  commenter
+  viewer
+}
+
+enum SuggestionType {
+  insert
+  delete
+  format
+}
+
+enum SuggestionStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum ExportTarget {
+  docx
+  pdf
+  rtf
+  txt
+}
+
+enum ExportJobStatus {
+  queued
+  processing
+  done
+  failed
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String?      @map("password_hash")
+  displayName  String?      @map("display_name")
+  avatarUrl    String?      @map("avatar_url")
+  authProvider AuthProvider @default(local) @map("auth_provider")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  oauthAccounts OAuthAccount[]
+  documents     Document[]
+  versions      DocumentVersion[]
+  permissions   DocumentPermission[]
+  comments      Comment[]
+  suggestions   Suggestion[]
+
+  @@map("users")
+}
+
+model OAuthAccount {
+  id                String        @id @default(uuid())
+  userId            String        @map("user_id")
+  provider          OAuthProvider
+  providerAccountId String        @map("provider_account_id")
+  accessToken       String?       @map("access_token") // encrypted at rest
+  refreshToken      String?       @map("refresh_token") // encrypted at rest
+  scope             String?
+  expiresAt         DateTime?     @map("expires_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+model Document {
+  id              String          @id @default(uuid())
+  ownerId         String          @map("owner_id")
+  title           String          @default("Untitled document")
+  storageProvider StorageProvider @default(db) @map("storage_provider")
+  storageRef      Json?           @map("storage_ref")
+  content         Json? // ProseMirror/Yjs document state when stored in db
+  pageSetup       Json            @default("{}") @map("page_setup")
+  currentVersionId String?        @map("current_version_id")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+
+  owner       User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  versions    DocumentVersion[]
+  permissions DocumentPermission[]
+  comments    Comment[]
+  suggestions Suggestion[]
+  assets      Asset[]
+  exportJobs  ExportJob[]
+
+  @@index([ownerId])
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id              String   @id @default(uuid())
+  documentId      String   @map("document_id")
+  authorId        String   @map("author_id")
+  contentSnapshot Json     @map("content_snapshot")
+  label           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id])
+
+  @@index([documentId])
+  @@map("document_versions")
+}
+
+model DocumentPermission {
+  id         String         @id @default(uuid())
+  documentId String         @map("document_id")
+  userId     String?        @map("user_id")
+  shareToken String?        @unique @map("share_token")
+  role       PermissionRole @default(viewer)
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([userId])
+  @@map("document_permissions")
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  documentId String   @map("document_id")
+  authorId   String   @map("author_id")
+  anchor     Json
+  body       String
+  resolved   Boolean  @default(false)
+  parentId   String?  @map("parent_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  document Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  author   User      @relation(fields: [authorId], references: [id])
+  parent   Comment?  @relation("CommentThread", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentThread")
+
+  @@index([documentId])
+  @@map("comments")
+}
+
+model Suggestion {
+  id         String           @id @default(uuid())
+  documentId String           @map("document_id")
+  authorId   String           @map("author_id")
+  type       SuggestionType
+  range      Json
+  payload    Json
+  status     SuggestionStatus @default(pending)
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id])
+
+  @@index([documentId])
+  @@map("suggestions")
+}
+
+model Asset {
+  id         String   @id @default(uuid())
+  documentId String   @map("document_id")
+  objectKey  String   @map("object_key")
+  mime       String
+  size       Int
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@map("assets")
+}
+
+model ExportJob {
+  id              String          @id @default(uuid())
+  documentId      String          @map("document_id")
+  target          ExportTarget
+  status          ExportJobStatus @default(queued)
+  resultObjectKey String?         @map("result_object_key")
+  error           String?
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@map("export_jobs")
+}
