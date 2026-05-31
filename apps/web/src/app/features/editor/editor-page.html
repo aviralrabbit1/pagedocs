@@ -1,0 +1,52 @@
+<header class="editor-topbar">
+  <a routerLink="/" class="back" title="Back to documents">←</a>
+  <input
+    class="doc-title"
+    [(ngModel)]="title"
+    (ngModelChange)="onTitleChange()"
+    placeholder="Untitled document"
+  />
+  <span class="status">{{ saveStatusLabel() }}</span>
+  <div class="spacer"></div>
+  <button class="tb" (click)="newDocument()" title="Create a new blank document">+ New</button>
+  <button class="tb" (click)="toggleFind()">Find &amp; replace</button>
+  <div class="info-wrap">
+    <button class="tb" (click)="toggleInfo()" title="Document details">ⓘ Info</button>
+    @if (showInfo()) {
+      <div class="info-backdrop" (click)="toggleInfo()"></div>
+      <div class="info-panel">
+        <h3>Document details</h3>
+        <dl>
+          <dt>Words</dt>
+          <dd>{{ wordCount() }}</dd>
+          <dt>Characters</dt>
+          <dd>{{ charCount() }}</dd>
+          <dt>Created</dt>
+          <dd>{{ createdAt() ? (createdAt() | date: 'medium') : '—' }}</dd>
+          <dt>Last modified</dt>
+          <dd>{{ lastModified() ? (lastModified() | date: 'medium') : '—' }}</dd>
+        </dl>
+      </div>
+    }
+  </div>
+</header>
+
+@if (editor(); as ed) {
+  <app-editor-toolbar [editor]="ed" />
+}
+
+<div class="editor-area">
+  @if (loading()) {
+    <p class="loading">Loading document…</p>
+  }
+
+  @if (editor(); as ed) {
+    @if (showFind()) {
+      <app-find-replace [editor]="ed" (closed)="toggleFind()" />
+    }
+  }
+
+  <div class="page">
+    <div #host class="editor-host"></div>
+  </div>
+</div>

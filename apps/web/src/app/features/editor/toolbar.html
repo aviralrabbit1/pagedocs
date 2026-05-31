@@ -1,0 +1,62 @@
+<div class="toolbar">
+  <div class="group">
+    <button title="Undo (Ctrl+Z)" (click)="undo()">↶</button>
+    <button title="Redo (Ctrl+Y)" (click)="redo()">↷</button>
+  </div>
+
+  <div class="group">
+    <select title="Paragraph style" [value]="currentBlock()" (change)="setBlock($any($event.target).value)">
+      <option value="p">Normal text</option>
+      <option value="h1">Heading 1</option>
+      <option value="h2">Heading 2</option>
+      <option value="h3">Heading 3</option>
+    </select>
+  </div>
+
+  <div class="group">
+    <select title="Font" (change)="setFontFamily($any($event.target).value)">
+      @for (f of fonts; track f.value) {
+        <option [value]="f.value">{{ f.label }}</option>
+      }
+    </select>
+    <select title="Font size" (change)="setFontSize($any($event.target).value)">
+      <option value="">Size</option>
+      @for (s of sizes; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="group">
+    <button title="Bold" [class.active]="isActive('bold')" (click)="toggleBold()"><b>B</b></button>
+    <button title="Italic" [class.active]="isActive('italic')" (click)="toggleItalic()"><i>I</i></button>
+    <button title="Underline" [class.active]="isActive('underline')" (click)="toggleUnderline()"><u>U</u></button>
+    <button title="Strikethrough" [class.active]="isActive('strike')" (click)="toggleStrike()"><s>S</s></button>
+    <button title="Inline code" [class.active]="isActive('code')" (click)="toggleCode()">&lt;/&gt;</button>
+  </div>
+
+  <div class="group">
+    <app-color-menu [editor]="editor" mode="text" />
+    <app-color-menu [editor]="editor" mode="highlight" />
+    <button title="Clear formatting" (click)="clearFormatting()">⌫</button>
+  </div>
+
+  <div class="group">
+    <button title="Align left" [class.active]="isAlign('left')" (click)="setAlign('left')">⯇</button>
+    <button title="Align center" [class.active]="isAlign('center')" (click)="setAlign('center')">≡</button>
+    <button title="Align right" [class.active]="isAlign('right')" (click)="setAlign('right')">⯈</button>
+    <button title="Justify" [class.active]="isAlign('justify')" (click)="setAlign('justify')">▤</button>
+  </div>
+
+  <div class="group">
+    <button title="Bullet list" [class.active]="isActive('bulletList')" (click)="toggleBullet()">•≡</button>
+    <button title="Numbered list" [class.active]="isActive('orderedList')" (click)="toggleOrdered()">1.</button>
+    <button title="Decrease indent (Ctrl+[)" (click)="outdent()">⇤</button>
+    <button title="Increase indent (Ctrl+])" (click)="indent()">⇥</button>
+  </div>
+
+  <div class="group">
+    <button title="Insert/edit link" [class.active]="isActive('link')" (click)="setLink()">🔗</button>
+    <button title="Add bookmark" (click)="addBookmark()">🔖</button>
+  </div>
+</div>

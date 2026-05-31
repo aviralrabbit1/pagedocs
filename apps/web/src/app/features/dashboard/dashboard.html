@@ -13,6 +13,22 @@
     <button (click)="refresh()">Refresh</button>
   </div>
 
+  @if (recent().length > 0) {
+    <section class="recent">
+      <h2>Recently opened</h2>
+      <div class="recent-row">
+        @for (r of recent(); track r.id) {
+          <button class="recent-card" (click)="open(r.id)">
+            <span class="r-title">{{ r.title }}</span>
+            <span class="r-meta">{{ r.openedAt | date: 'short' }}</span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  <h2 class="section-heading">All documents</h2>
+
   @if (loading()) {
     <p>Loading…</p>
   } @else if (docs().length === 0) {
@@ -20,10 +36,10 @@
   } @else {
     <ul class="doc-list">
       @for (doc of docs(); track doc.id) {
-        <li>
+        <li (click)="open(doc.id)">
           <span class="title">{{ doc.title }}</span>
           <span class="meta">{{ doc.updatedAt | date: 'short' }}</span>
-          <button (click)="remove(doc.id)">Delete</button>
+          <button (click)="remove(doc.id, $event)">Delete</button>
         </li>
       }
     </ul>

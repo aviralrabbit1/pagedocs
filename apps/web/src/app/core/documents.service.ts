@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import type {
   DocumentDto,
   DocumentSummaryDto,
+  UpdateDocumentDto,
 } from '@pagedocs/shared-types';
 import { API_BASE_URL } from './config';
 
@@ -22,6 +23,10 @@ export class DocumentsService {
 
   create(title?: string): Observable<DocumentDto> {
     return this.http.post<DocumentDto>(this.base, { title });
+  }
+
+  update(id: string, patch: UpdateDocumentDto): Observable<DocumentDto> {
+    return this.http.patch<DocumentDto>(`${this.base}/${id}`, patch);
   }
 
   remove(id: string): Observable<{ id: string; deleted: boolean }> {
