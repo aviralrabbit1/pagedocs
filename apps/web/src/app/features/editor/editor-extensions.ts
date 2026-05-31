@@ -33,9 +33,14 @@ export function buildExtensions(ydoc: Y.Doc): Extensions {
     Indent,
     Bookmark,
     Link.configure({
-      openOnClick: false,
+      openOnClick: true,
       autolink: true,
-      HTMLAttributes: { rel: 'noopener noreferrer nofollow' },
+      linkOnPaste: true,
+      defaultProtocol: 'https',
+      HTMLAttributes: {
+        target: '_blank',
+        rel: 'noopener noreferrer nofollow',
+      },
     }),
     SearchReplace,
     Collaboration.configure({ document: ydoc }),

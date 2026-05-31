@@ -102,19 +102,46 @@ export class EditorToolbar {
     const previous = this.editor.getAttributes('link')['href'] as
       | string
       | undefined;
-    const url = window.prompt('Link URL (leave empty to remove):', previous ?? '');
-    if (url === null) {
+    const input = window.prompt(
+      'Link URL (leave empty to remove):',
+      previous ?? '',
+    );
+    if (input === null) {
       return;
     }
+    const url = input.trim();
+
+    // Empty -> remove the link from the current range.
     if (url === '') {
       this.editor.chain().focus().extendMarkRange('link').unsetLink().run();
       return;
     }
+
+    // Add a protocol if the user typed a bare domain.
+    const href = /^(https?:|mailto:|tel:|#|\/)/i.test(url)
+      ? url
+      : `https://${url}`;
+
+    const { from, to } = this.editor.state.selection;
+    if (from === to) {
+      // No selection: insert the URL as clickable, linked text.
+      this.editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: 'text',
+          text: url,
+          marks: [{ type: 'link', attrs: { href } }],
+        })
+        .run();
+      return;
+    }
+
     this.editor
       .chain()
       .focus()
       .extendMarkRange('link')
-      .setLink({ href: url })
+      .setLink({ href })
       .run();
   }
   addBookmark() {
