@@ -1,0 +1,37 @@
+<div class="color-menu">
+  <button
+    type="button"
+    class="trigger"
+    [title]="title"
+    (click)="toggle()"
+  >
+    <span class="letter">{{ triggerLabel }}</span>
+    <span class="bar" [style.background]="activeColor()"></span>
+  </button>
+
+  @if (open()) {
+    <div class="backdrop" (click)="open.set(false)"></div>
+    <div class="panel">
+      <button type="button" class="reset" (click)="reset()">
+        <span class="reset-icon">⊘</span> {{ resetLabel }}
+      </button>
+
+      <div class="swatches">
+        @for (c of swatches; track c) {
+          <button
+            type="button"
+            class="swatch"
+            [style.background]="c"
+            [title]="c"
+            (click)="apply(c)"
+          ></button>
+        }
+      </div>
+
+      <label class="custom">
+        Custom
+        <input type="color" (input)="applyCustom($any($event.target).value)" />
+      </label>
+    </div>
+  }
+</div>

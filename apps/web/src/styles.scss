@@ -122,6 +122,12 @@ main {
     border: 1px solid #d0d7de;
     border-radius: 8px;
     margin-bottom: 0.5rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: #54aeff;
+      background: #f6fbff;
+    }
 
     .title {
       font-weight: 600;

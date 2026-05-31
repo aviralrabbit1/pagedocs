@@ -1,0 +1,57 @@
+.find-replace {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  input[type='text'] {
+    height: 28px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 0 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  button {
+    height: 28px;
+    min-width: 28px;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+
+    &:hover {
+      background: #f3f4f6;
+    }
+  }
+
+  .count {
+    font-size: 0.75rem;
+    color: #57606a;
+    min-width: 56px;
+    text-align: center;
+  }
+
+  .case {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.8rem;
+    color: #57606a;
+  }
+}

@@ -20,10 +20,10 @@
   } @else {
     <ul class="doc-list">
       @for (doc of docs(); track doc.id) {
-        <li>
+        <li (click)="open(doc.id)">
           <span class="title">{{ doc.title }}</span>
           <span class="meta">{{ doc.updatedAt | date: 'short' }}</span>
-          <button (click)="remove(doc.id)">Delete</button>
+          <button (click)="remove(doc.id, $event)">Delete</button>
         </li>
       }
     </ul>

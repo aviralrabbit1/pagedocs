@@ -1,0 +1,24 @@
+<div class="find-replace">
+  <div class="row">
+    <input
+      type="text"
+      placeholder="Find"
+      [(ngModel)]="term"
+      (ngModelChange)="onTermChange()"
+      (keydown.enter)="next()"
+    />
+    <span class="count">{{ count() }}</span>
+    <button title="Previous" (click)="prev()">↑</button>
+    <button title="Next" (click)="next()">↓</button>
+    <button title="Close" (click)="close()">✕</button>
+  </div>
+  <div class="row">
+    <input type="text" placeholder="Replace with" [(ngModel)]="replacement" />
+    <button (click)="replaceOne()">Replace</button>
+    <button (click)="replaceAll()">All</button>
+    <label class="case">
+      <input type="checkbox" [(ngModel)]="caseSensitive" (ngModelChange)="onCaseToggle()" />
+      Aa
+    </label>
+  </div>
+</div>

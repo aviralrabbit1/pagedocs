@@ -37,13 +37,16 @@ export class Dashboard implements OnInit {
 
   create(): void {
     this.documents.create().subscribe((doc) => {
-      // Phase 1 will route to the editor; for now just refresh the list.
-      this.refresh();
-      void doc;
+      void this.router.navigate(['/documents', doc.id]);
     });
   }
 
-  remove(id: string): void {
+  open(id: string): void {
+    void this.router.navigate(['/documents', id]);
+  }
+
+  remove(id: string, event: Event): void {
+    event.stopPropagation();
     this.documents.remove(id).subscribe(() => this.refresh());
   }
 
