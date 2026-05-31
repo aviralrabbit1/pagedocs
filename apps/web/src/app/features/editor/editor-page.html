@@ -1,0 +1,32 @@
+<header class="editor-topbar">
+  <a routerLink="/" class="back" title="Back to documents">←</a>
+  <input
+    class="doc-title"
+    [(ngModel)]="title"
+    (ngModelChange)="onTitleChange()"
+    placeholder="Untitled document"
+  />
+  <span class="status">{{ saveStatusLabel() }}</span>
+  <div class="spacer"></div>
+  <button class="find-btn" (click)="toggleFind()">Find &amp; replace</button>
+</header>
+
+@if (editor(); as ed) {
+  <app-editor-toolbar [editor]="ed" />
+}
+
+<div class="editor-area">
+  @if (loading()) {
+    <p class="loading">Loading document…</p>
+  }
+
+  @if (editor(); as ed) {
+    @if (showFind()) {
+      <app-find-replace [editor]="ed" (closed)="toggleFind()" />
+    }
+  }
+
+  <div class="page">
+    <div #host class="editor-host"></div>
+  </div>
+</div>

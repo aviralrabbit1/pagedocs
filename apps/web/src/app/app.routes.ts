@@ -24,5 +24,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
+  {
+    path: 'documents/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/editor/editor-page').then((m) => m.EditorPage),
+  },
   { path: '**', redirectTo: '' },
 ];
